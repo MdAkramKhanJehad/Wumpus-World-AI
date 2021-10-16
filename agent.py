@@ -1,19 +1,3 @@
-"""
-Legend:
-. = visited tile
-A = agent
-G = gold
-W = wumpus
-S = stench
-w = potential wumpus
-nw = no wumpus
-P = pit
-B = breeze
-p = potential pit
-np = no pit
-"""
-
-# from pandas import * # pip install pandas
 import time
 
 
@@ -27,14 +11,12 @@ class Agent:
         self.mark_tile_visited()
         self.world.cave_entrance_row = self.world.agent_row
         self.world.cave_entrance_col = self.world.agent_col
-        self.found_gold = False  # self.exit_cave(found_gold)
+        self.found_gold = False
         self.took_gold = False
         self.exited = False
         self.label_grid = label_grid
 
         self.repaint_world()
-        # print(DataFrame(self.world_knowledge))
-        # print("Agent: [" + str(self.world.agent_row) + ", " + str(self.world.agent_col) + "]")
 
     def repaint_world(self):
         for i in range(self.world.num_rows):
@@ -57,14 +39,10 @@ class Agent:
 
                 self.label_grid[i][j].change_text(updated_str.join(updated_text))
                 if '.' in self.world_knowledge[i][j]:
-                    # background color of visited
                     self.label_grid[i][j].label.config(bg="grey")
                 self.label_grid[i][j].label.update()
-        # print("repainted")
 
     def go_back_one_tile(self):
-        # print(self.path_out_of_cave)
-        # print(self.path_out_of_cave[-1][0])
 
         if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
             self.move('u')
@@ -79,7 +57,6 @@ class Agent:
 
     def leave_cave(self):
         for tile in reversed(self.path_out_of_cave):
-            # print("Leaving from: " + str(self.path_out_of_cave))
             if self.world.agent_row - 1 == tile[0]:
                 self.move('u')
             if self.world.agent_row + 1 == tile[0]:
@@ -110,7 +87,6 @@ class Agent:
                         if self.move('u'):
                             already_moved = True
 
-                    # print(self.path_out_of_cave)
             except IndexError:
                 pass
 
@@ -120,7 +96,6 @@ class Agent:
                     if not already_moved:
                         if self.move('r'):
                             already_moved = True
-                    # print(self.path_out_of_cave)
             except IndexError:
                 pass
 
@@ -130,7 +105,6 @@ class Agent:
                     if not already_moved:
                         if self.move('d'):
                             already_moved = True
-                    # print(self.path_out_of_cave)
             except IndexError:
                 pass
 
@@ -140,36 +114,17 @@ class Agent:
                     if not already_moved:
                         if self.move('l'):
                             already_moved = True
-                    # print(self.path_out_of_cave)
             except IndexError:
                 pass
-
-            # print(already_moved)
 
             if not already_moved:
                 self.go_back_one_tile()
 
             already_moved = False
 
-            """
-            if last_move != 'u' and self.move('u'):
-                if self.found_gold == True:
-                    break
-                if self.move('u'):
-                    pass
-                elif self.move('r'):
-                    pass
-                elif self.move('l'):
-                    pass
-                elif self.move('d'):
-                    pass
-                last_move = 'u'
-            """
-
     def move(self, direction):
 
         self.repaint_world()
-        # when found the gold
         if self.found_gold == True and self.took_gold == False:
             self.took_gold == True
             if 'G' in self.world_knowledge[self.world.agent_row][self.world.agent_col]:
@@ -197,17 +152,12 @@ class Agent:
             self.clean_predictions()
             self.confirm_wumpus_knowledge()
 
-            # print(DataFrame(self.world_knowledge))
-            # print("Agent: [" + str(self.world.agent_row) + ", " + str(self.world.agent_col) + "]")
-            # print("Path out:" + str(self.path_out_of_cave))
+
             if 'G' in self.world_knowledge[self.world.agent_row][self.world.agent_col]:
-                # print("You found the gold! Time to leave!")
                 self.found_gold = True
 
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
-
-            # print("Successful move: " + str(successful_move))
 
             time.sleep(1)
 
@@ -485,27 +435,8 @@ class Agent:
         try:
             if 'w' in self.world_knowledge[row][col] or 'p' in self.world_knowledge[row][col] or 'W' in \
                     self.world_knowledge[row][col] or 'P' in self.world_knowledge[row][col]:
-                # print("UNSAFE MOVE")
                 return False
         except IndexError:
             pass
-        # try:
-        #     if 'p' in self.world_knowledge[row][col]:
-        #         # print("UNSAFE MOVE")
-        #         return False
-        # except IndexError:
-        #     pass
-        # try:
-        #     if 'W' in self.world_knowledge[row][col]:
-        #         # print("UNSAFE MOVE")
-        #         return False
-        # except IndexError:
-        #     pass
-        # try:
-        #     if 'P' in self.world_knowledge[row][col]:
-        #         # print("UNSAFE MOVE")
-        #         return False
-        # except IndexError:
-        #     pass
 
         return True
