@@ -15,8 +15,8 @@ class Agent:
         self.took_gold = False
         self.exited = False
         self.label_grid = label_grid
-
         self.repaint_world()
+        self.danger_probability = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
 
     def repaint_world(self):
         for i in range(self.world.num_rows):
@@ -36,14 +36,20 @@ class Agent:
                     updated_text.append('G')
 
                 updated_str = ""
-
                 self.label_grid[i][j].change_text(updated_str.join(updated_text))
                 if '.' in self.world_knowledge[i][j]:
                     self.label_grid[i][j].label.config(bg="grey")
                 self.label_grid[i][j].label.update()
 
     def go_back_one_tile(self):
+        # for index in range(self.world.num_rows):
+        #     for jndex in range(self.world.num_cols):
+        #         print(self.world.world[index][jndex], end="\t")
+        #     print("")
+        # print("")
 
+        # if len(self.path_out_of_cave) <1:
+        #     sort_position(self)
         if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
             self.move('u')
         if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
@@ -54,6 +60,11 @@ class Agent:
             self.move('l')
 
         del self.path_out_of_cave[-1]
+
+    def sort_position(self):
+        pass
+
+
 
     def leave_cave(self):
         for tile in reversed(self.path_out_of_cave):
@@ -73,10 +84,13 @@ class Agent:
                         break
 
     def explore(self):
-        last_move = ''
         already_moved = False
         while not self.found_gold:
-
+            for index in range(self.world.num_rows):
+                for jndex in range(self.world.num_cols):
+                    print(self.danger_probability[index][jndex], end="\t")
+                print("")
+            print("")
             if self.found_gold:
                 break
 
@@ -151,16 +165,11 @@ class Agent:
             self.predict_pits()
             self.clean_predictions()
             self.confirm_wumpus_knowledge()
-
-
             if 'G' in self.world_knowledge[self.world.agent_row][self.world.agent_col]:
                 self.found_gold = True
-
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
-
-            time.sleep(1)
-
+            time.sleep(0.25)
         return successful_move
 
     def add_indicators_to_knowledge(self):
@@ -185,33 +194,38 @@ class Agent:
             if 'B' in self.world.world[self.world.agent_row][self.world.agent_col]:
                 if self.world.agent_row - 1 >= 0:
                     if '.' not in self.world.world[self.world.agent_row - 1][self.world.agent_col]:
+                        print(self.world.world[self.world.agent_row - 1][self.world.agent_col])
+                        self.danger_probability[self.world.agent_row - 1][self.world.agent_col] += 0.25
                         if 'p' not in self.world_knowledge[self.world.agent_row - 1][self.world.agent_col]:
                             self.world_knowledge[self.world.agent_row - 1][self.world.agent_col].append('p')
         except IndexError:
             pass
-
         try:
             if 'B' in self.world.world[self.world.agent_row][self.world.agent_col]:
                 if self.world.agent_col + 1 < self.world.num_cols:
                     if '.' not in self.world.world[self.world.agent_row][self.world.agent_col + 1]:
+                        print(self.world.world[self.world.agent_row][self.world.agent_col + 1])
+                        self.danger_probability[self.world.agent_row][self.world.agent_col + 1] += 0.25
                         if 'p' not in self.world_knowledge[self.world.agent_row][self.world.agent_col + 1]:
                             self.world_knowledge[self.world.agent_row][self.world.agent_col + 1].append('p')
         except IndexError:
             pass
-
         try:
             if 'B' in self.world.world[self.world.agent_row][self.world.agent_col]:
                 if self.world.agent_row + 1 < self.world.num_rows:
                     if '.' not in self.world.world[self.world.agent_row + 1][self.world.agent_col]:
+                        print(self.world.world[self.world.agent_row + 1][self.world.agent_col])
+                        self.danger_probability[self.world.agent_row + 1][self.world.agent_col] += 0.25
                         if 'p' not in self.world_knowledge[self.world.agent_row + 1][self.world.agent_col]:
                             self.world_knowledge[self.world.agent_row + 1][self.world.agent_col].append('p')
         except IndexError:
             pass
-
         try:
             if 'B' in self.world.world[self.world.agent_row][self.world.agent_col]:
                 if self.world.agent_col - 1 >= 0:
                     if '.' not in self.world.world[self.world.agent_row][self.world.agent_col - 1]:
+                        print( self.world.world[self.world.agent_row][self.world.agent_col - 1] )
+                        self.danger_probability[self.world.agent_row][self.world.agent_col - 1] += 0.25
                         if 'p' not in self.world_knowledge[self.world.agent_row][self.world.agent_col - 1]:
                             self.world_knowledge[self.world.agent_row][self.world.agent_col - 1].append('p')
         except IndexError:
@@ -263,66 +277,84 @@ class Agent:
                         if i - 1 >= 0:
                             if '.' in self.world_knowledge[i - 1][j]:
                                 if 'S' not in self.world_knowledge[i - 1][j]:
-                                    self.world_knowledge[i][j].remove('w')
-                                    self.world_knowledge[i][j].append('nw')
+                                    if 'w' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('w')
+                                        self.world_knowledge[i][j].append('nw')
                     except IndexError:
                         pass
                     try:
                         if j + 1 < self.world.num_cols:
                             if '.' in self.world_knowledge[i][j + 1]:
                                 if 'S' not in self.world_knowledge[i][j + 1]:
-                                    self.world_knowledge[i][j].remove('w')
-                                    self.world_knowledge[i][j].append('nw')
+                                    if 'w' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('w')
+                                        self.world_knowledge[i][j].append('nw')
                     except IndexError:
                         pass
                     try:
                         if i + 1 < self.world.num_rows:
                             if '.' in self.world_knowledge[i + 1][j]:
                                 if 'S' not in self.world_knowledge[i + 1][j]:
-                                    self.world_knowledge[i][j].remove('w')
-                                    self.world_knowledge[i][j].append('nw')
+                                    if 'w' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('w')
+                                        self.world_knowledge[i][j].append('nw')
                     except IndexError:
                         pass
                     try:
                         if j - 1 >= 0:
                             if '.' in self.world_knowledge[i][j - 1]:
                                 if 'S' not in self.world_knowledge[i][j - 1]:
-                                    self.world_knowledge[i][j].remove('w')
-                                    self.world_knowledge[i][j].append('nw')
+                                    if 'w' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('w')
+                                        self.world_knowledge[i][j].append('nw')
                     except IndexError:
                         pass
 
                 if 'p' in self.world_knowledge[i][j]:
+
                     try:
                         if i - 1 >= 0:
                             if '.' in self.world_knowledge[i - 1][j]:
                                 if 'B' not in self.world_knowledge[i - 1][j]:
-                                    self.world_knowledge[i][j].remove('p')
-                                    self.world_knowledge[i][j].append('np')
+                                    print("i-1 = ", self.world_knowledge[i][j])
+                                    if 'p' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('p')
+                                        self.danger_probability[i][j]-=0.25
+                                        self.world_knowledge[i][j].append('np')
                     except IndexError:
                         pass
                     try:
                         if j + 1 < self.world.num_cols:
                             if '.' in self.world_knowledge[i][j + 1]:
                                 if 'B' not in self.world_knowledge[i][j + 1]:
-                                    self.world_knowledge[i][j].remove('p')
-                                    self.world_knowledge[i][j].append('np')
+                                    print(i, "  ", j)
+                                    print("j+1 = ",self.world_knowledge[i][j])
+                                    if 'p' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('p')
+                                        self.danger_probability[i][j] -= 0.25
+                                        self.world_knowledge[i][j].append('np')
                     except IndexError:
                         pass
                     try:
                         if i + 1 < self.world.num_rows:
                             if '.' in self.world_knowledge[i + 1][j]:
                                 if 'B' not in self.world_knowledge[i + 1][j]:
-                                    self.world_knowledge[i][j].remove('p')
-                                    self.world_knowledge[i][j].append('np')
+                                    print("i+1 = ", self.world_knowledge[i][j])
+                                    if 'p' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('p')
+                                        self.danger_probability[i][j] -= 0.25
+                                        self.world_knowledge[i][j].append('np')
                     except IndexError:
                         pass
                     try:
                         if j - 1 >= 0:
                             if '.' in self.world_knowledge[i][j - 1]:
                                 if 'B' not in self.world_knowledge[i][j - 1]:
-                                    self.world_knowledge[i][j].remove('p')
-                                    self.world_knowledge[i][j].append('np')
+                                    print("j-1 = ", self.world_knowledge[i][j])
+                                    if 'p' in self.world_knowledge[i][j]:
+                                        self.world_knowledge[i][j].remove('p')
+                                        self.danger_probability[i][j] -= 0.25
+                                        self.world_knowledge[i][j].append('np')
                     except IndexError:
                         pass
 

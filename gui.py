@@ -24,7 +24,7 @@ def solve_wumpus_world(master, world_file):
 
 master = Tk()
 master.title("Wumpus World")
-master.iconbitmap("icon.ico")
+# master.iconbitmap("icon.ico")
 
 world = World()
 world.generate_world("world_1.txt")
