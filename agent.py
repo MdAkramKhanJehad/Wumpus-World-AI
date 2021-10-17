@@ -6,6 +6,7 @@ class Agent:
         self.world = world
         self.world_knowledge = [[[] for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
         self.world_knowledge[self.world.agent_row][self.world.agent_col].append('A')
+
         self.num_stenches = 0
         self.path_out_of_cave = [[self.world.agent_row, self.world.agent_col]]
         self.mark_tile_visited()
@@ -43,7 +44,7 @@ class Agent:
                 self.label_grid[i][j].label.update()
 
     def go_back_one_tile(self):
-
+        print(self.world.agent_row, " ", self.world.agent_col)
         if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
             self.move('u')
         if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
@@ -159,7 +160,7 @@ class Agent:
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
 
-            time.sleep(1)
+            time.sleep(0.9)
 
         return successful_move
 
