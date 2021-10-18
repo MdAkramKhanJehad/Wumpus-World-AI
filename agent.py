@@ -6,6 +6,7 @@ class Agent:
         self.world = world
         self.world_knowledge = [[[] for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
         self.world_knowledge[self.world.agent_row][self.world.agent_col].append('A')
+
         self.num_stenches = 0
         self.path_out_of_cave = [[self.world.agent_row, self.world.agent_col]]
         self.mark_tile_visited()
@@ -83,6 +84,7 @@ class Agent:
 
     def explore(self,master):
         already_moved = False
+
         while (not self.found_gold) and (not self.in_dead_lock):
             for index in range(self.world.num_rows):
                 for jndex in range(self.world.num_cols):
@@ -91,6 +93,13 @@ class Agent:
             print("")
             if self.found_gold:
                 break
+
+            if 'P' in self.world.world[self.world.agent_row][self.world.agent_col]:
+                messagebox.showwarning("Warning", "GAME OVER")
+                self.quit(master)
+            elif 'W' in self.world.world[self.world.agent_row][self.world.agent_col]:
+                messagebox.showwarning("Warning", "GAME OVER")
+                self.quit(master)
 
             try:
                 if '.' not in self.world_knowledge[self.world.agent_row - 1][
@@ -135,7 +144,7 @@ class Agent:
             already_moved = False
 
 
-    def move(self, direction, master=None):
+    def move(self, direction):
 
         self.repaint_world()
 
