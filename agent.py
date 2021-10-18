@@ -1,4 +1,5 @@
 import time
+from tkinter import messagebox
 
 
 class Agent:
@@ -17,7 +18,7 @@ class Agent:
         self.label_grid = label_grid
         self.repaint_world()
         self.danger_probability = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
-
+        self.in_dead_lock = False
     def repaint_world(self):
         for i in range(self.world.num_rows):
             for j in range(self.world.num_cols):
@@ -41,16 +42,17 @@ class Agent:
                     self.label_grid[i][j].label.config(bg="grey")
                 self.label_grid[i][j].label.update()
 
-    def go_back_one_tile(self):
-        # for index in range(self.world.num_rows):
-        #     for jndex in range(self.world.num_cols):
-        #         print(self.world.world[index][jndex], end="\t")
-        #     print("")
-        # print("")
+    def quit(self, master):
+        master.destroy()
+
+    def go_back_one_tile(self, master):
+
         print("Path out cave len = ",len(self.path_out_of_cave))
         if len(self.path_out_of_cave) <= 1:
-            print("aytae ashce")
-            self.sort_position()
+            self.in_dead_lock = True
+            messagebox.showwarning("Warning", "You are in deadlock!")
+            time.sleep(1)
+            self.quit(master)
         else:
             if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
                 self.move('u')
@@ -62,21 +64,6 @@ class Agent:
                 self.move('l')
 
             del self.path_out_of_cave[-1]
-
-    def sort_position(self):
-        temp_row = temp_col = -1
-        lowest_val = 10
-
-        for row_itr in range(self.world.num_rows):
-            for col_itr in range(self.world.num_cols):
-                if 0 < self.danger_probability[row_itr][col_itr] < lowest_val:
-                    temp_row = row_itr
-                    temp_col = col_itr
-        print("sorted row col = ",temp_row, "  ",temp_col)
-        return 0;
-
-
-
 
     def leave_cave(self):
         for tile in reversed(self.path_out_of_cave):
@@ -95,9 +82,9 @@ class Agent:
                         self.exited = True
                         break
 
-    def explore(self):
+    def explore(self,master):
         already_moved = False
-        while not self.found_gold:
+        while (not self.found_gold) and (not self.in_dead_lock):
             for index in range(self.world.num_rows):
                 for jndex in range(self.world.num_cols):
                     print(self.danger_probability[index][jndex], end="\t")
@@ -144,11 +131,12 @@ class Agent:
                 pass
 
             if not already_moved:
-                self.go_back_one_tile()
+                self.go_back_one_tile(master)
 
             already_moved = False
 
-    def move(self, direction):
+
+    def move(self, direction, master=None):
 
         self.repaint_world()
 
@@ -156,7 +144,6 @@ class Agent:
             self.took_gold == True
             if 'G' in self.world_knowledge[self.world.agent_row][self.world.agent_col]:
                 self.world_knowledge[self.world.agent_row][self.world.agent_col].remove('G')
-
         successful_move = False
         if direction == 'u':
             if self.is_safe_move(self.world.agent_row - 1, self.world.agent_col):

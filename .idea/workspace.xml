@@ -4,6 +4,7 @@
     <list default="true" id="d16c7a95-6866-4bc7-a668-2139d710a531" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/agent.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/world_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/world_1.txt" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -130,7 +131,7 @@
       <option name="presentableId" value="Default" />
       <updated>1633525590983</updated>
       <workItem from="1634479423472" duration="11218000" />
-      <workItem from="1634519598712" duration="3226000" />
+      <workItem from="1634519598712" duration="7091000" />
     </task>
     <servers />
   </component>
@@ -138,6 +139,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/Wumpus_World_AI$gui.coverage" NAME="gui Coverage Results" MODIFIED="1634524781365" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/Wumpus_World_AI$gui.coverage" NAME="gui Coverage Results" MODIFIED="1634529178813" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>
