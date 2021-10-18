@@ -96,11 +96,11 @@ class Agent:
         already_moved = False
 
         while (not self.found_gold) and (not self.in_dead_lock):
-            for index in range(self.world.num_rows):
-                for jndex in range(self.world.num_cols):
-                    print(self.danger_probability[index][jndex], end="\t")
-                print("")
-            print("")
+            # for index in range(self.world.num_rows):
+            #     for jndex in range(self.world.num_cols):
+            #         print(self.danger_probability[index][jndex], end="\t")
+            #     print("")
+            # print("")
             if self.found_gold:
                 break
 
