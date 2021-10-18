@@ -6,7 +6,6 @@
 <<<<<<< HEAD
 =======
       <change beforePath="$PROJECT_DIR$/agent.py" beforeDir="false" afterPath="$PROJECT_DIR$/agent.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/gui.py" beforeDir="false" afterPath="$PROJECT_DIR$/gui.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/world_1.txt" beforeDir="false" afterPath="$PROJECT_DIR$/world_1.txt" afterDir="false" />
 >>>>>>> 16732e547fd07ec3fff6d7cbb10525bc1e5e3c26
     </list>
@@ -134,7 +133,7 @@
       <option name="presentableId" value="Default" />
       <updated>1633525590983</updated>
       <workItem from="1634479423472" duration="11218000" />
-      <workItem from="1634519598712" duration="7091000" />
+      <workItem from="1634519598712" duration="10588000" />
     </task>
     <servers />
   </component>
@@ -194,10 +193,14 @@
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
 <<<<<<< HEAD
+<<<<<<< HEAD
     <SUITE FILE_PATH="coverage/Wumpus_World_AI$gui.coverage" NAME="gui Coverage Results" MODIFIED="1634492357601" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
 >>>>>>> 16732e547fd07ec3fff6d7cbb10525bc1e5e3c26
 =======
     <SUITE FILE_PATH="coverage/Wumpus_World_AI$gui.coverage" NAME="gui Coverage Results" MODIFIED="1634529178813" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
 >>>>>>> e9486a075766d3859353ac5d6f034ed888389e0a
+=======
+    <SUITE FILE_PATH="coverage/Wumpus_World_AI$gui.coverage" NAME="gui Coverage Results" MODIFIED="1634532801870" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="true" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+>>>>>>> 4202cc66d79f2c4505379df2eb96d8ee44369efe
   </component>
 </project>

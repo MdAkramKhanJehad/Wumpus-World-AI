@@ -1,7 +1,6 @@
 import time
 from tkinter import messagebox
 
-
 class Agent:
     def __init__(self, world, label_grid):
         self.world = world
@@ -59,22 +58,22 @@ class Agent:
     def go_back_one_tile(self, master):
 
         print("Path out cave len = ",len(self.path_out_of_cave))
-        if len(self.path_out_of_cave) <= 1:
-            self.in_dead_lock = True
-            messagebox.showwarning("Warning", "You are in deadlock!")
-            time.sleep(1)
-            self.quit(master)
-        else:
-            if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
-                self.move('u')
-            if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
-                self.move('d')
-            if self.world.agent_col + 1 == self.path_out_of_cave[-1][1]:
-                self.move('r')
-            if self.world.agent_col - 1 == self.path_out_of_cave[-1][1]:
-                self.move('l')
+        # if len(self.path_out_of_cave) <= 1:
+        #     self.in_dead_lock = True
+        #     messagebox.showwarning("Warning", "You are in deadlock!")
+        #     time.sleep(1)
+        #     self.quit(master)
 
-            del self.path_out_of_cave[-1]
+        if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
+            self.move('u')
+        if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
+            self.move('d')
+        if self.world.agent_col + 1 == self.path_out_of_cave[-1][1]:
+            self.move('r')
+        if self.world.agent_col - 1 == self.path_out_of_cave[-1][1]:
+            self.move('l')
+
+        del self.path_out_of_cave[-1]
 
     def leave_cave(self):
         for tile in reversed(self.path_out_of_cave):
@@ -95,6 +94,7 @@ class Agent:
 
     def explore(self,master):
         already_moved = False
+
         while (not self.found_gold) and (not self.in_dead_lock):
             for index in range(self.world.num_rows):
                 for jndex in range(self.world.num_cols):
@@ -103,6 +103,13 @@ class Agent:
             print("")
             if self.found_gold:
                 break
+
+            if 'P' in self.world.world[self.world.agent_row][self.world.agent_col]:
+                messagebox.showwarning("Warning", "GAME OVER")
+                self.quit(master)
+            elif 'W' in self.world.world[self.world.agent_row][self.world.agent_col]:
+                messagebox.showwarning("Warning", "GAME OVER")
+                self.quit(master)
 
             try:
                 if '.' not in self.world_knowledge[self.world.agent_row - 1][
@@ -147,7 +154,7 @@ class Agent:
             already_moved = False
 
 
-    def move(self, direction, master=None):
+    def move(self, direction):
 
         self.repaint_world()
 
@@ -181,7 +188,7 @@ class Agent:
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
 
-            time.sleep(0.9)
+            time.sleep(0.3)
 
         return successful_move
 
