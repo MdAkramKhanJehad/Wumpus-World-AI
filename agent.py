@@ -1,7 +1,6 @@
 import time
 from tkinter import messagebox
 
-
 class Agent:
     def __init__(self, world, label_grid):
         self.world = world
@@ -48,22 +47,22 @@ class Agent:
     def go_back_one_tile(self, master):
 
         print("Path out cave len = ",len(self.path_out_of_cave))
-        if len(self.path_out_of_cave) <= 1:
-            self.in_dead_lock = True
-            messagebox.showwarning("Warning", "You are in deadlock!")
-            time.sleep(1)
-            self.quit(master)
-        else:
-            if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
-                self.move('u')
-            if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
-                self.move('d')
-            if self.world.agent_col + 1 == self.path_out_of_cave[-1][1]:
-                self.move('r')
-            if self.world.agent_col - 1 == self.path_out_of_cave[-1][1]:
-                self.move('l')
+        # if len(self.path_out_of_cave) <= 1:
+        #     self.in_dead_lock = True
+        #     messagebox.showwarning("Warning", "You are in deadlock!")
+        #     time.sleep(1)
+        #     self.quit(master)
 
-            del self.path_out_of_cave[-1]
+        if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
+            self.move('u')
+        if self.world.agent_row + 1 == self.path_out_of_cave[-1][0]:
+            self.move('d')
+        if self.world.agent_col + 1 == self.path_out_of_cave[-1][1]:
+            self.move('r')
+        if self.world.agent_col - 1 == self.path_out_of_cave[-1][1]:
+            self.move('l')
+
+        del self.path_out_of_cave[-1]
 
     def leave_cave(self):
         for tile in reversed(self.path_out_of_cave):
