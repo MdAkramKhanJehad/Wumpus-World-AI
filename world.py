@@ -15,13 +15,7 @@ class World:
     def generate_world(self, file_name):
 
         file_parser = File_Parser(file_name)
-        """
-        print(file_parser.row_col)
-        print(file_parser.agent)
-        print(file_parser.wumpus)
-        print(file_parser.gold)
-        print(file_parser.pits)
-        """
+
         self.num_rows = int(file_parser.row_col[0])
         self.num_cols = int(file_parser.row_col[1])
 
