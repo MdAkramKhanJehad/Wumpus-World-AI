@@ -96,11 +96,12 @@ class Agent:
         already_moved = False
 
         while (not self.found_gold) and (not self.in_dead_lock):
-            # for index in range(self.world.num_rows):
-            #     for jndex in range(self.world.num_cols):
-            #         print(self.danger_probability[index][jndex], end="\t")
-            #     print("")
-            # print("")
+            for index in range(self.world.num_rows):
+                for jndex in range(self.world.num_cols):
+                    print(self.danger_probability[index][jndex], end="\t")
+                print("")
+            print("")
+            print("**********Current Agent Position:", self.world.agent_row, self.world.agent_col)
             if self.found_gold:
                 break
 
@@ -188,7 +189,7 @@ class Agent:
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
 
-            time.sleep(0.3)
+            time.sleep(0.9)
 
         return successful_move
 

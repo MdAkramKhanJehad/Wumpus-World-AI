@@ -16,10 +16,7 @@ def solve_wumpus_world(master, world_file):
         agent.explore(master)
         if agent.found_gold:
             print("Found gold")
-            # messagebox.showinfo("Congratulation", "You found the gold!")
-            # time.sleep(1)
-            # agent.quit(master)
-            # agent.leave_cave()
+
         break
     agent.repaint_world()
     agent.world_knowledge[agent.world.agent_row][agent.world.agent_col].remove('A')
