@@ -1,6 +1,7 @@
 import time
 from tkinter import messagebox
 
+
 class Agent:
     def __init__(self, world, label_grid):
         self.world = world
@@ -9,6 +10,8 @@ class Agent:
 
         self.num_stenches = 0
         self.path_out_of_cave = [[self.world.agent_row, self.world.agent_col]]
+        self.check_deadlock_availability = [[-1 for i in range(self.world.num_cols)] for j in
+                                            range(self.world.num_rows)]
         self.mark_tile_visited()
         self.world.cave_entrance_row = self.world.agent_row
         self.world.cave_entrance_col = self.world.agent_col
@@ -19,6 +22,7 @@ class Agent:
         self.repaint_world()
         self.danger_probability = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
         self.in_dead_lock = False
+
     def repaint_world(self):
         for i in range(self.world.num_rows):
             for j in range(self.world.num_cols):
@@ -47,12 +51,12 @@ class Agent:
 
     def go_back_one_tile(self, master):
 
-        print("Path out cave len = ",len(self.path_out_of_cave))
-        # if len(self.path_out_of_cave) <= 1:
-        #     self.in_dead_lock = True
-        #     messagebox.showwarning("Warning", "You are in deadlock!")
-        #     time.sleep(1)
-        #     self.quit(master)
+        print("Path out cave len = ", len(self.path_out_of_cave))
+        if len(self.path_out_of_cave) <= 1:
+            self.in_dead_lock = True
+            messagebox.showwarning("Warning", "You are in deadlock!")
+            time.sleep(1)
+            self.quit(master)
 
         if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
             self.move('u')
@@ -82,13 +86,14 @@ class Agent:
                         self.exited = True
                         break
 
-    def explore(self,master):
+    def explore(self, master):
         already_moved = False
+
 
         while (not self.found_gold) and (not self.in_dead_lock):
             for index in range(self.world.num_rows):
                 for jndex in range(self.world.num_cols):
-                    print(self.danger_probability[index][jndex], end="\t")
+                    print(self.check_deadlock_availability[index][jndex], end="\t")
                 print("")
             print("")
             if self.found_gold:
@@ -100,6 +105,22 @@ class Agent:
             elif 'W' in self.world.world[self.world.agent_row][self.world.agent_col]:
                 messagebox.showwarning("Warning", "GAME OVER")
                 self.quit(master)
+            self.deadlock_availability(self.world.agent_row, self.world.agent_col)
+            check_zero = self.check_is_there_any_zero()
+            if not check_zero:
+                print("NO ZERO")
+                lowest_row, lowest_col = self.find_lowest_danger_probability()
+                print("Lowest row = ", lowest_row, " lowest col = ", lowest_col)
+                # traversing_path = [[self.world.agent_row, self.world.agent_col]]
+                self.traverse_between_two_pos(lowest_row, lowest_col,self.world.agent_row,self.world.agent_col)
+
+                for index in range(self.world.num_rows):
+                    for jndex in range(self.world.num_cols):
+                        print(self.danger_probability[index][jndex], end="\t")
+                    print("")
+                print("")
+                break
+
 
             try:
                 if '.' not in self.world_knowledge[self.world.agent_row - 1][
@@ -143,6 +164,80 @@ class Agent:
 
             already_moved = False
 
+    def traverse_between_two_pos(self,target_row,target_col,parent_row,parent_col):
+        print("current row = ",self.world.agent_row, " current col = ", self.world.agent_col)
+        print("Parent row = ", parent_row, " Parent col = ", parent_col)
+        if self.world.agent_row == target_row and self.world.agent_col == target_col:
+            print("Paisi")
+            return
+        if self.world.agent_row > 0:
+            temp_value = self.world.agent_row
+            self.world.agent_row -= 1
+            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+                print("print 1")
+                self.traverse_between_two_pos(target_row,target_col,temp_value,self.world.agent_col )
+
+        if self.world.agent_row < self.world.num_rows - 1:
+            temp_value = self.world.agent_row
+            self.world.agent_row += 1
+            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+                print("print 2")
+                self.traverse_between_two_pos(target_row, target_col, temp_value, self.world.agent_col)
+
+        if self.world.agent_col > 0:
+            temp_value = self.world.agent_col
+            self.world.agent_col -= 1
+            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+                print("print 3")
+                self.traverse_between_two_pos(target_row, target_col,self.world.agent_row,temp_value)
+
+        if self.world.agent_col < self.world.num_cols - 1:
+            temp_value = self.world.agent_col
+            self.world.agent_col += 1
+            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+                print("print 4")
+                self.traverse_between_two_pos(target_row, target_col, self.world.agent_row, temp_value)
+
+        return
+
+
+    def check_is_there_any_zero(self):
+        for index in range(self.world.num_rows):
+            for jndex in range(self.world.num_cols):
+                if self.check_deadlock_availability[index][jndex] == 0:
+                    return True
+
+        return False
+
+    def find_lowest_danger_probability(self):
+        lowest = 100000.0
+        temp_row = -1
+        temp_col = -1
+        for index in range(self.world.num_rows):
+            for jndex in range(self.world.num_cols):
+                if lowest > self.danger_probability[index][jndex] > 0.0:
+                    lowest = self.danger_probability[index][jndex]
+                    temp_row = index
+                    temp_col = jndex
+        return temp_row, temp_col
+
+    def deadlock_availability(self, row, col):
+        if 'B' in self.world_knowledge[row][col] or 'S' in self.world_knowledge[row][col]:
+            return
+
+        if row > 0:
+            if self.check_deadlock_availability[row - 1][col] != 1:
+                self.check_deadlock_availability[row - 1][col] = 0
+        if row < self.world.num_rows - 1:
+            if self.check_deadlock_availability[row + 1][col] != 1:
+                self.check_deadlock_availability[row + 1][col] = 0
+
+        if col > 0:
+            if self.check_deadlock_availability[row][col - 1] != 1:
+                self.check_deadlock_availability[row][col - 1] = 0
+        if col < self.world.num_cols - 1:
+            if self.check_deadlock_availability[row][col + 1] != 1:
+                self.check_deadlock_availability[row][col + 1] = 0
 
     def move(self, direction):
 
@@ -460,6 +555,7 @@ class Agent:
         if '.' not in self.world_knowledge[self.world.agent_row][self.world.agent_col]:
             self.world.world[self.world.agent_row][self.world.agent_col].append('.')
             self.world_knowledge[self.world.agent_row][self.world.agent_col].append('.')
+            self.check_deadlock_availability[self.world.agent_row][self.world.agent_col] = 1
 
     def is_dead(self):
         if 'W' in self.world.world[self.world.agent_row][self.world.agent_col]:
