@@ -112,7 +112,7 @@ class Agent:
                 lowest_row, lowest_col = self.find_lowest_danger_probability()
                 print("Lowest row = ", lowest_row, " lowest col = ", lowest_col)
                 # traversing_path = [[self.world.agent_row, self.world.agent_col]]
-                self.traverse_between_two_pos(lowest_row, lowest_col,self.world.agent_row,self.world.agent_col)
+                self.traverse_between_two_pos(lowest_row, lowest_col)
 
                 for index in range(self.world.num_rows):
                     for jndex in range(self.world.num_cols):
@@ -164,41 +164,146 @@ class Agent:
 
             already_moved = False
 
-    def traverse_between_two_pos(self,target_row,target_col,parent_row,parent_col):
-        print("current row = ",self.world.agent_row, " current col = ", self.world.agent_col)
-        print("Parent row = ", parent_row, " Parent col = ", parent_col)
-        if self.world.agent_row == target_row and self.world.agent_col == target_col:
-            print("Paisi")
-            return
-        if self.world.agent_row > 0:
-            temp_value = self.world.agent_row
-            self.world.agent_row -= 1
-            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
-                print("print 1")
-                self.traverse_between_two_pos(target_row,target_col,temp_value,self.world.agent_col )
+    def traverse_between_two_pos(self, target_row, target_col):
+        is_visited_array = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
+        Dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+        q = []
+        q.append((self.world.agent_row,self.world.agent_col))
 
-        if self.world.agent_row < self.world.num_rows - 1:
-            temp_value = self.world.agent_row
-            self.world.agent_row += 1
-            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
-                print("print 2")
-                self.traverse_between_two_pos(target_row, target_col, temp_value, self.world.agent_col)
+        while (len(q) > 0):
+            p = q[0]
+            print("current row = ", self.world.agent_row, " current col = ", self.world.agent_col)
+            for index in range(self.world.num_rows):
+                for jndex in range(self.world.num_cols):
+                    print(is_visited_array[index][jndex], end="\t")
+                print("")
+            print("")
 
-        if self.world.agent_col > 0:
-            temp_value = self.world.agent_col
-            self.world.agent_col -= 1
-            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
-                print("print 3")
-                self.traverse_between_two_pos(target_row, target_col,self.world.agent_row,temp_value)
+            q.pop(0)
 
-        if self.world.agent_col < self.world.num_cols - 1:
-            temp_value = self.world.agent_col
-            self.world.agent_col += 1
-            if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
-                print("print 4")
-                self.traverse_between_two_pos(target_row, target_col, self.world.agent_row, temp_value)
+            # mark as visited
+            is_visited_array[p[0]][p[1]] = 1
 
-        return
+            # destination is reached.
+            if self.world.agent_row == target_row and self.world.agent_col == target_col:
+                print("Paisi")
+                return True
+
+            # check all four directions
+            for i in range(4):
+
+                # using the direction array
+                a = p[0] + Dir[i][0]
+                b = p[1] + Dir[i][1]
+
+                # not blocked and valid
+                if (a >= 0 and b >= 0 and a < self.world.num_rows and b < self.world.num_cols and is_visited_array[a][b] != 1):
+                    q.append((a, b))
+                    self.world.agent_row = a
+                    self.world.agent_col = b
+        return False
+
+        # while self.world.agent_row != target_row and self.world.agent_col != target_col:
+        #     if self.world.agent_row > 0:
+        #         temp_value = self.world.agent_row
+        #         self.world.agent_row -= 1
+        #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #             print("print 1")
+        #
+        #
+        #
+        #     if self.world.agent_row < self.world.num_rows - 1:
+        #         temp_value = self.world.agent_row
+        #         self.world.agent_row += 1
+        #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #             print("print 2")
+        #
+        #
+        #     if self.world.agent_col > 0:
+        #         temp_value = self.world.agent_col
+        #         self.world.agent_col -= 1
+        #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #             print("print 3")
+        #
+        #
+        #     if self.world.agent_col < self.world.num_cols - 1:
+        #         temp_value = self.world.agent_col
+        #         self.world.agent_col += 1
+        #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #             print("print 4")
+
+
+
+        # print("current row = ", self.world.agent_row, " current col = ", self.world.agent_col)
+        # print("Parent row = ", parent_row, " Parent col = ", parent_col)
+        # if self.world.agent_row == target_row and self.world.agent_col == target_col:
+        #     print("Paisi")
+        #     return
+        # if self.world.agent_row > 0:
+        #     temp_value = self.world.agent_row
+        #     self.world.agent_row -= 1
+        #     if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #         print("print 1")
+        #         self.traverse_between_two_pos(target_row, target_col, temp_value, self.world.agent_col)
+        #
+        # if self.world.agent_row < self.world.num_rows - 1:
+        #     temp_value = self.world.agent_row
+        #     self.world.agent_row += 1
+        #     if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #         print("print 2")
+        #         self.traverse_between_two_pos(target_row, target_col, temp_value, self.world.agent_col)
+        #
+        # if self.world.agent_col > 0:
+        #     temp_value = self.world.agent_col
+        #     self.world.agent_col -= 1
+        #     if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #         print("print 3")
+        #         self.traverse_between_two_pos(target_row, target_col, self.world.agent_row, temp_value)
+        #
+        # if self.world.agent_col < self.world.num_cols - 1:
+        #     temp_value = self.world.agent_col
+        #     self.world.agent_col += 1
+        #     if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+        #         print("print 4")
+        #         self.traverse_between_two_pos(target_row, target_col, self.world.agent_row, temp_value)
+        #
+        # return
+
+    # def traverse_between_two_pos(self,target_row,target_col,parent_row,parent_col):
+    #     print("current row = ",self.world.agent_row, " current col = ", self.world.agent_col)
+    #     print("Parent row = ", parent_row, " Parent col = ", parent_col)
+    #     if self.world.agent_row == target_row and self.world.agent_col == target_col:
+    #         print("Paisi")
+    #         return
+    #     if self.world.agent_row > 0:
+    #         temp_value = self.world.agent_row
+    #         self.world.agent_row -= 1
+    #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+    #             print("print 1")
+    #             self.traverse_between_two_pos(target_row,target_col,temp_value,self.world.agent_col )
+    #
+    #     if self.world.agent_row < self.world.num_rows - 1:
+    #         temp_value = self.world.agent_row
+    #         self.world.agent_row += 1
+    #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+    #             print("print 2")
+    #             self.traverse_between_two_pos(target_row, target_col, temp_value, self.world.agent_col)
+    #
+    #     if self.world.agent_col > 0:
+    #         temp_value = self.world.agent_col
+    #         self.world.agent_col -= 1
+    #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+    #             print("print 3")
+    #             self.traverse_between_two_pos(target_row, target_col,self.world.agent_row,temp_value)
+    #
+    #     if self.world.agent_col < self.world.num_cols - 1:
+    #         temp_value = self.world.agent_col
+    #         self.world.agent_col += 1
+    #         if parent_row == self.world.agent_row and parent_col == self.world.agent_col:
+    #             print("print 4")
+    #             self.traverse_between_two_pos(target_row, target_col, self.world.agent_row, temp_value)
+    #
+    #     return
 
 
     def check_is_there_any_zero(self):
