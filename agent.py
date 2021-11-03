@@ -108,7 +108,7 @@ class Agent:
             self.deadlock_availability(self.world.agent_row, self.world.agent_col)
             check_zero = self.check_is_there_any_zero()
             if not check_zero:
-                print("NO ZERO")
+
                 lowest_row, lowest_col = self.find_lowest_danger_probability()
                 self.check_deadlock_availability[lowest_row][lowest_col] = 0
                 for index in range(self.world.num_rows):
@@ -120,7 +120,7 @@ class Agent:
                 parent_array =  [[(-1, -1) for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
                 # parent_array.append([])
                 starting_point = [self.world.agent_row,self.world.agent_col]
-                self.traverse_between_two_pos(lowest_row, lowest_col,parent_array,starting_point)
+                self.traverse_between_two_pos(lowest_row, lowest_col,parent_array,starting_point,master)
 
                 for index in range(self.world.num_rows):
                     for jndex in range(self.world.num_cols):
@@ -129,6 +129,14 @@ class Agent:
                 print("")
                 break
 
+            try:
+                if '.' not in self.world_knowledge[self.world.agent_row][
+                    self.world.agent_col + 1] and self.is_safe_move(self.world.agent_row, self.world.agent_col + 1):
+                    if not already_moved:
+                        if self.move('r'):
+                            already_moved = True
+            except IndexError:
+                pass
 
             try:
                 if '.' not in self.world_knowledge[self.world.agent_row - 1][
@@ -140,14 +148,7 @@ class Agent:
             except IndexError:
                 pass
 
-            try:
-                if '.' not in self.world_knowledge[self.world.agent_row][
-                    self.world.agent_col + 1] and self.is_safe_move(self.world.agent_row, self.world.agent_col + 1):
-                    if not already_moved:
-                        if self.move('r'):
-                            already_moved = True
-            except IndexError:
-                pass
+
 
             try:
                 if '.' not in self.world_knowledge[self.world.agent_row + 1][
@@ -171,7 +172,33 @@ class Agent:
                 self.go_back_one_tile(master)
             already_moved = False
 
-    def traverse_between_two_pos(self, target_row, target_col, parent_array,starting_point):
+    def changeAgentPosition(self,back_path_list, master):
+        print("Start changeAgentPosition.agent pos. row = ",self.world.agent_row, ". col = ",self.world.agent_col)
+        Dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+        for i in range(len(back_path_list)):
+            next_move_dir = "o"
+            print("Destination. a = ", back_path_list[i][0], " b = ", back_path_list[i][1])
+            for j in range(4):
+                a = self.world.agent_row + Dir[j][0]
+                b = self.world.agent_col + Dir[j][1]
+
+                if a == back_path_list[i][0] and b == back_path_list[i][1]:
+                    if j == 0:
+                        next_move_dir = 'r'
+                    elif j ==1:
+                        next_move_dir = 'l'
+                    elif j ==2:
+                        next_move_dir = 'd'
+                    elif j ==3:
+                        next_move_dir = 'u'
+                    print("a = ", a, ". b = ", b)
+                    self.move(next_move_dir, True)
+                    break
+        self.explore(master)
+
+
+
+    def traverse_between_two_pos(self, target_row, target_col, parent_array,starting_point, master):
 
         is_visited_array = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
         Dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
@@ -191,17 +218,10 @@ class Agent:
 
             # mark as visited
             is_visited_array[p[0]][p[1]] = 1
-
-            # if self.world.agent_row == target_row and self.world.agent_col == target_col:
-            #     print("Paisi row= ",target_row," col = ",target_col)
-            #     # self.back_track(parent_array,starting_point,target_row, target_col)
-
-            if parent_array[target_row][target_col] != (-1,-1):
-                print("Paisi 2 row= ", target_row, " col = ", target_col)
-                self.back_track(parent_array, starting_point, target_row, target_col)
+            if parent_array[target_row][target_col] != (-1, -1):
+                self.back_track(parent_array, starting_point, target_row, target_col, master)
                 break
 
-            print("Parent p = ", p)
             for i in range(4):
 
                 # using the direction array
@@ -217,12 +237,12 @@ class Agent:
                     print("Right. a = ", a, " b = ", b)
                     parent_array[a][b] = p
                     q.append((a, b))
-                    self.world.agent_row = a
-                    self.world.agent_col = b
+                    # self.world.agent_row = a
+                    # self.world.agent_col = b
 
         return False
 
-    def back_track(self,parent_array,starting_point,target_row, target_col):
+    def back_track(self,parent_array,starting_point,target_row, target_col, master):
         print("*********************************88Enter in Back Track")
         back_path_list = []
         current_row = target_row
@@ -241,6 +261,13 @@ class Agent:
                 break
             current_row = temp[0]
             current_col = temp[1]
+
+        back_path_list.reverse()
+
+        back_path_list = back_path_list[1:]
+        print(back_path_list)
+        self.changeAgentPosition(back_path_list,master)
+
 
 
 
@@ -425,7 +452,7 @@ class Agent:
             if self.check_deadlock_availability[row][col + 1] != 1:
                 self.check_deadlock_availability[row][col + 1] = 0
 
-    def move(self, direction):
+    def move(self, direction, is_force_move=False):
 
         self.repaint_world()
 
@@ -435,16 +462,17 @@ class Agent:
                 self.world_knowledge[self.world.agent_row][self.world.agent_col].remove('G')
         successful_move = False
         if direction == 'u':
-            if self.is_safe_move(self.world.agent_row - 1, self.world.agent_col):
+            if self.is_safe_move(self.world.agent_row - 1, self.world.agent_col, is_force_move):
                 successful_move = self.move_up()
         if direction == 'r':
-            if self.is_safe_move(self.world.agent_row, self.world.agent_col + 1):
+            if self.is_safe_move(self.world.agent_row, self.world.agent_col + 1, is_force_move):
+
                 successful_move = self.move_right()
         if direction == 'd':
-            if self.is_safe_move(self.world.agent_row + 1, self.world.agent_col):
+            if self.is_safe_move(self.world.agent_row + 1, self.world.agent_col, is_force_move):
                 successful_move = self.move_down()
         if direction == 'l':
-            if self.is_safe_move(self.world.agent_row, self.world.agent_col - 1):
+            if self.is_safe_move(self.world.agent_row, self.world.agent_col - 1, is_force_move):
                 successful_move = self.move_left()
 
         if successful_move:
@@ -459,6 +487,7 @@ class Agent:
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
             time.sleep(0.05)
+            print("agent last pos.row = ", self.world.agent_row, ".col = ", self.world.agent_col)
         return successful_move
 
     def add_indicators_to_knowledge(self):
@@ -753,7 +782,9 @@ class Agent:
         else:
             return False
 
-    def is_safe_move(self, row, col):
+    def is_safe_move(self, row, col, is_force_move=False):
+        if is_force_move:
+            return True
         try:
             if 'w' in self.world_knowledge[row][col] or 'p' in self.world_knowledge[row][col] or 'W' in \
                     self.world_knowledge[row][col] or 'P' in self.world_knowledge[row][col]:
