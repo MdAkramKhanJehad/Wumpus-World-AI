@@ -55,7 +55,7 @@ class Agent:
         if len(self.path_out_of_cave) <= 1:
             self.in_dead_lock = True
             messagebox.showwarning("Warning", "You are in deadlock!")
-            time.sleep(1)
+            time.sleep(.05)
             self.quit(master)
 
         if self.world.agent_row - 1 == self.path_out_of_cave[-1][0]:
@@ -110,9 +110,17 @@ class Agent:
             if not check_zero:
                 print("NO ZERO")
                 lowest_row, lowest_col = self.find_lowest_danger_probability()
+                self.check_deadlock_availability[lowest_row][lowest_col] = 0
+                for index in range(self.world.num_rows):
+                    for jndex in range(self.world.num_cols):
+                        print(self.check_deadlock_availability[index][jndex], end="\t")
+                    print("")
+                print("")
                 print("Lowest row = ", lowest_row, " lowest col = ", lowest_col)
-                # traversing_path = [[self.world.agent_row, self.world.agent_col]]
-                self.traverse_between_two_pos(lowest_row, lowest_col)
+                parent_array =  [[(-1, -1) for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
+                # parent_array.append([])
+                starting_point = [self.world.agent_row,self.world.agent_col]
+                self.traverse_between_two_pos(lowest_row, lowest_col,parent_array,starting_point)
 
                 for index in range(self.world.num_rows):
                     for jndex in range(self.world.num_cols):
@@ -161,21 +169,21 @@ class Agent:
 
             if not already_moved:
                 self.go_back_one_tile(master)
-
             already_moved = False
 
-    def traverse_between_two_pos(self, target_row, target_col):
+    def traverse_between_two_pos(self, target_row, target_col, parent_array,starting_point):
+
         is_visited_array = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
         Dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
         q = []
-        q.append((self.world.agent_row,self.world.agent_col))
+        q.append((self.world.agent_row, self.world.agent_col))
 
         while (len(q) > 0):
             p = q[0]
             print("current row = ", self.world.agent_row, " current col = ", self.world.agent_col)
             for index in range(self.world.num_rows):
                 for jndex in range(self.world.num_cols):
-                    print(is_visited_array[index][jndex], end="\t")
+                    print(parent_array[index][jndex], end="\t")
                 print("")
             print("")
 
@@ -184,12 +192,16 @@ class Agent:
             # mark as visited
             is_visited_array[p[0]][p[1]] = 1
 
-            # destination is reached.
-            if self.world.agent_row == target_row and self.world.agent_col == target_col:
-                print("Paisi")
-                return True
+            # if self.world.agent_row == target_row and self.world.agent_col == target_col:
+            #     print("Paisi row= ",target_row," col = ",target_col)
+            #     # self.back_track(parent_array,starting_point,target_row, target_col)
 
-            # check all four directions
+            if parent_array[target_row][target_col] != (-1,-1):
+                print("Paisi 2 row= ", target_row, " col = ", target_col)
+                self.back_track(parent_array, starting_point, target_row, target_col)
+                break
+
+            print("Parent p = ", p)
             for i in range(4):
 
                 # using the direction array
@@ -197,11 +209,80 @@ class Agent:
                 b = p[1] + Dir[i][1]
 
                 # not blocked and valid
-                if (a >= 0 and b >= 0 and a < self.world.num_rows and b < self.world.num_cols and is_visited_array[a][b] != 1):
+
+                print("a = ", a, " b = ", b)
+
+
+                if a>=0 and a <self.world.num_rows and b>=0 and b < self.world.num_cols and is_visited_array[a][b] != 1 and self.check_deadlock_availability[a][b] != -1:
+                    print("Right. a = ", a, " b = ", b)
+                    parent_array[a][b] = p
                     q.append((a, b))
                     self.world.agent_row = a
                     self.world.agent_col = b
+
         return False
+
+    def back_track(self,parent_array,starting_point,target_row, target_col):
+        print("*********************************88Enter in Back Track")
+        back_path_list = []
+        current_row = target_row
+        current_col = target_col
+        back_path_list.append((target_row,target_col))
+        # print("starting row= ", starting_point[0], "col = ", starting_point[1])
+
+        while True:
+            temp = parent_array[current_row][current_col]
+            back_path_list.append(temp)
+            print("temp zero row= ",temp[0], "col = ",temp[1])
+            # print(back_path_list)
+            if starting_point[0] == temp[0] and starting_point[1] == temp[1]:
+                print("Success")
+                print(back_path_list)
+                break
+            current_row = temp[0]
+            current_col = temp[1]
+
+
+
+    # def traverse_between_two_pos(self, target_row, target_col):
+    #     is_visited_array = [[0 for i in range(self.world.num_cols)] for j in range(self.world.num_rows)]
+    #     Dir = [[0, 1], [0, -1], [1, 0], [-1, 0]]
+    #     q = []
+    #     q.append((self.world.agent_row,self.world.agent_col))
+    #
+    #     while (len(q) > 0):
+    #         p = q[0]
+    #         print("current row = ", self.world.agent_row, " current col = ", self.world.agent_col)
+    #         for index in range(self.world.num_rows):
+    #             for jndex in range(self.world.num_cols):
+    #                 print(is_visited_array[index][jndex], end="\t")
+    #             print("")
+    #         print("")
+    #
+    #         q.pop(0)
+    #
+    #         # mark as visited
+    #         is_visited_array[p[0]][p[1]] = 1
+    #
+    #         # destination is reached.
+    #         if self.world.agent_row == target_row and self.world.agent_col == target_col:
+    #             print("Paisi")
+    #             return True
+    #
+    #         # check all four directions
+    #         for i in range(4):
+    #
+    #             # using the direction array
+    #             a = p[0] + Dir[i][0]
+    #             b = p[1] + Dir[i][1]
+    #
+    #             # not blocked and valid
+    #             if (a >= 0 and b >= 0 and a < self.world.num_rows and b < self.world.num_cols and is_visited_array[a][b] != 1):
+    #                 q.append((a, b))
+    #                 self.world.agent_row = a
+    #                 self.world.agent_col = b
+    #             time.sleep(0.50)
+    #     return False
 
         # while self.world.agent_row != target_row and self.world.agent_col != target_col:
         #     if self.world.agent_row > 0:
@@ -377,7 +458,7 @@ class Agent:
                 self.found_gold = True
             if not self.found_gold:
                 self.path_out_of_cave.append([self.world.agent_row, self.world.agent_col])
-            time.sleep(0.25)
+            time.sleep(0.05)
         return successful_move
 
     def add_indicators_to_knowledge(self):
